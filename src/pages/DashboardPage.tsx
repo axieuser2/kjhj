@@ -2,13 +2,16 @@ import React from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { SubscriptionStatus } from '../components/SubscriptionStatus';
+import { TrialStatus } from '../components/TrialStatus';
 import { useSubscription } from '../hooks/useSubscription';
+import { useTrialStatus } from '../hooks/useTrialStatus';
 import { Link } from 'react-router-dom';
 import { Crown, Settings, LogOut, ShoppingBag, Zap, Trash2 } from 'lucide-react';
 
 export function DashboardPage() {
   const { user, signOut } = useAuth();
   const { hasActiveSubscription, isTrialing } = useSubscription();
+  const { isTrialActive, isTrialExpired, isScheduledForDeletion } = useTrialStatus();
 
   const handleDeleteAccount = async () => {
     if (!confirm('Are you sure you want to delete your account? This action cannot be undone and will remove your access to AI workflows.')) {
@@ -82,6 +85,13 @@ export function DashboardPage() {
           <div className="lg:col-span-2 space-y-8">
             <div className="bg-white border-2 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8">
               <h3 className="text-xl font-bold text-black mb-6 uppercase tracking-wide">
+                TRIAL STATUS
+              </h3>
+              <TrialStatus />
+            </div>
+
+            <div className="bg-white border-2 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8">
+              <h3 className="text-xl font-bold text-black mb-6 uppercase tracking-wide">
                 SUBSCRIPTION STATUS
               </h3>
               <SubscriptionStatus />
@@ -122,7 +132,7 @@ export function DashboardPage() {
                   </a>
                 )}
                 
-                {!(hasActiveSubscription || isTrialing) && (
+                {!(hasActiveSubscription || isTrialing) && !isTrialExpired && !isScheduledForDeletion && (
                   <div className="flex items-center gap-4 p-6 border-2 border-gray-300 rounded-none opacity-50">
                     <div className="w-12 h-12 bg-gray-300 text-gray-500 flex items-center justify-center rounded-none">
                       <Zap className="w-6 h-6" />
@@ -130,6 +140,18 @@ export function DashboardPage() {
                     <div>
                       <h4 className="font-bold text-gray-500 uppercase tracking-wide">AI WORKFLOWS</h4>
                       <p className="text-sm text-gray-400">Requires active subscription</p>
+                    </div>
+                  </div>
+                )}
+
+                {(isTrialExpired || isScheduledForDeletion) && !hasActiveSubscription && (
+                  <div className="flex items-center gap-4 p-6 border-2 border-red-600 rounded-none bg-red-50">
+                    <div className="w-12 h-12 bg-red-600 text-white flex items-center justify-center rounded-none">
+                      <AlertTriangle className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-red-800 uppercase tracking-wide">TRIAL EXPIRED</h4>
+                      <p className="text-sm text-red-700">Upgrade to Pro to restore access</p>
                     </div>
                   </div>
                 )}
@@ -158,11 +180,14 @@ export function DashboardPage() {
 
             <div className="bg-black text-white border-2 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8">
               <h3 className="text-xl font-bold mb-3 uppercase tracking-wide">
-                {hasActiveSubscription || isTrialing ? 'STUDIO ACCESS' : 'START FREE TRIAL'}
+                {hasActiveSubscription || isTrialing ? 'STUDIO ACCESS' : 
+                 isTrialExpired || isScheduledForDeletion ? 'UPGRADE REQUIRED' : 'START FREE TRIAL'}
               </h3>
               <p className="text-gray-300 text-sm mb-6">
                 {hasActiveSubscription || isTrialing 
                   ? 'Your AI workflow studio is ready to use with full access to all features.'
+                  : isTrialExpired || isScheduledForDeletion
+                  ? 'Your trial has expired. Upgrade to Pro to restore access to AI workflows.'
                   : 'Get 7 days free access to advanced AI workflow capabilities.'
                 }
               </p>
@@ -176,13 +201,21 @@ export function DashboardPage() {
                   <Zap className="w-4 h-4" />
                   OPEN STUDIO
                 </a>
-              ) : (
+              ) : !(isTrialExpired || isScheduledForDeletion) ? (
                 <Link
                   to="/products"
                   className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-none font-bold hover:bg-gray-100 transition-colors uppercase tracking-wide border-2 border-white hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.3)]"
                 >
                   <Crown className="w-4 h-4" />
                   START TRIAL
+                </Link>
+              ) : (
+                <Link
+                  to="/products"
+                  className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-none font-bold hover:bg-red-700 transition-colors uppercase tracking-wide border-2 border-red-600 hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.3)]"
+                >
+                  <Crown className="w-4 h-4" />
+                  UPGRADE NOW
                 </Link>
               )}
             </div>
@@ -192,7 +225,7 @@ export function DashboardPage() {
                 DANGER ZONE
               </h3>
               <p className="text-gray-600 text-sm mb-4">
-                Permanently delete your account and all associated data.
+                Permanently delete your account and all associated data. This will also remove your Axie Studio account.
               </p>
               <button
                 onClick={handleDeleteAccount}

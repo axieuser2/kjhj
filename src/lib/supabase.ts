@@ -123,6 +123,36 @@ export type Database = {
           deleted_at?: string | null;
         };
       };
+      user_trials: {
+        Row: {
+          id: number;
+          user_id: string;
+          trial_start_date: string;
+          trial_end_date: string;
+          trial_status: 'active' | 'expired' | 'converted_to_paid' | 'scheduled_for_deletion';
+          deletion_scheduled_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          trial_start_date?: string;
+          trial_end_date?: string;
+          trial_status?: 'active' | 'expired' | 'converted_to_paid' | 'scheduled_for_deletion';
+          deletion_scheduled_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          trial_start_date?: string;
+          trial_end_date?: string;
+          trial_status?: 'active' | 'expired' | 'converted_to_paid' | 'scheduled_for_deletion';
+          deletion_scheduled_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
     Views: {
       stripe_user_subscriptions: {
@@ -150,6 +180,17 @@ export type Database = {
           payment_status: string;
           order_status: 'pending' | 'completed' | 'canceled';
           order_date: string;
+        };
+      };
+      user_trial_info: {
+        Row: {
+          user_id: string;
+          trial_start_date: string;
+          trial_end_date: string;
+          trial_status: 'active' | 'expired' | 'converted_to_paid' | 'scheduled_for_deletion';
+          deletion_scheduled_at: string | null;
+          seconds_remaining: number;
+          days_remaining: number;
         };
       };
     };

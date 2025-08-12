@@ -50,6 +50,15 @@ export function useSubscription() {
             ...data,
             product_name: product?.name,
           });
+
+          // If user has active subscription, mark trial as converted
+          if (data.subscription_status === 'active' || data.subscription_status === 'trialing') {
+            try {
+              await supabase.rpc('mark_trial_converted', { p_user_id: user.id });
+            } catch (error) {
+              console.error('Failed to mark trial as converted:', error);
+            }
+          }
         } else {
           setSubscription(null);
         }
