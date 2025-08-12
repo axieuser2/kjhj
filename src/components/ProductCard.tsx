@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StripeProduct } from '../stripe-config';
 import { Check, Loader2, Crown } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useUserAccess } from '../hooks/useUserAccess';
 
 interface ProductCardProps {
   product: StripeProduct;
@@ -10,6 +11,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, isCurrentPlan = false }: ProductCardProps) {
   const [loading, setLoading] = useState(false);
+  const { refetch: refetchAccess } = useUserAccess();
 
   const handlePurchase = async () => {
     try {
@@ -42,6 +44,8 @@ export function ProductCard({ product, isCurrentPlan = false }: ProductCardProps
       const { url } = await response.json();
       
       if (url) {
+        // Refresh access status before redirecting
+        refetchAccess();
         window.location.href = url;
       } else {
         throw new Error('No checkout URL received');

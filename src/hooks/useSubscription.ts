@@ -51,12 +51,13 @@ export function useSubscription() {
             product_name: product?.name,
           });
 
-          // If user has active subscription, mark trial as converted
+          // Sync subscription status to ensure trial protection
           if (data.subscription_status === 'active' || data.subscription_status === 'trialing') {
             try {
-              await supabase.rpc('mark_trial_converted', { p_user_id: user.id });
+              await supabase.rpc('sync_subscription_status');
+              await supabase.rpc('protect_paying_customers');
             } catch (error) {
-              console.error('Failed to mark trial as converted:', error);
+              console.error('Failed to sync subscription status:', error);
             }
           }
         } else {

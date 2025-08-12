@@ -89,6 +89,15 @@ async function handleEvent(event: Stripe.Event) {
     if (isSubscription) {
       console.info(`Starting subscription sync for customer: ${customerId}`);
       await syncCustomerFromStripe(customerId);
+      
+      // CRITICAL: Protect the user from deletion after subscription sync
+      try {
+        await supabase.rpc('sync_subscription_status');
+        await supabase.rpc('protect_paying_customers');
+        console.info(`Protected customer ${customerId} from trial deletion`);
+      } catch (error) {
+        console.error(`Failed to protect customer ${customerId}:`, error);
+      }
     } else if (mode === 'payment' && payment_status === 'paid') {
       try {
         // Extract the necessary information from the session

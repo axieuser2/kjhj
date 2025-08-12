@@ -110,7 +110,23 @@ Deno.serve(async (req) => {
     // This function should be called by a cron job or scheduled task
     console.log('Starting trial cleanup process...');
 
-    // Step 1: Check for expired trials and schedule deletions
+    // Step 1: Protect paying customers first (CRITICAL SAFETY STEP)
+    const { error: protectError } = await supabase.rpc('protect_paying_customers');
+    
+    if (protectError) {
+      console.error('Error protecting paying customers:', protectError);
+      throw new Error('Failed to protect paying customers');
+    }
+    
+    // Step 2: Sync subscription status
+    const { error: syncError } = await supabase.rpc('sync_subscription_status');
+    
+    if (syncError) {
+      console.error('Error syncing subscription status:', syncError);
+      throw new Error('Failed to sync subscription status');
+    }
+    
+    // Step 3: Check for expired trials and schedule deletions
     const { error: checkError } = await supabase.rpc('check_expired_trials');
     
     if (checkError) {
@@ -118,7 +134,7 @@ Deno.serve(async (req) => {
       throw new Error('Failed to check expired trials');
     }
 
-    // Step 2: Get users scheduled for deletion
+    // Step 4: Get users scheduled for deletion (with safety checks)
     const { data: usersToDelete, error: getUsersError } = await supabase.rpc('get_users_for_deletion');
     
     if (getUsersError) {
@@ -128,10 +144,27 @@ Deno.serve(async (req) => {
 
     console.log(`Found ${usersToDelete?.length || 0} users scheduled for deletion`);
 
-    // Step 3: Delete each expired user
+    // Step 5: Final safety check before deletion
+    const safeUsersToDelete = [];
+    for (const userToDelete of usersToDelete || []) {
+      // Double-check that user doesn't have active subscription
+      const { data: subscriptionCheck } = await supabase
+        .from('stripe_user_subscriptions')
+        .select('subscription_status')
+        .eq('customer_id', userToDelete.user_id)
+        .single();
+        
+      if (!subscriptionCheck || !['active', 'trialing'].includes(subscriptionCheck.subscription_status)) {
+        safeUsersToDelete.push(userToDelete);
+      } else {
+        console.log(`SAFETY: Skipping deletion of ${userToDelete.email} - has active subscription`);
+      }
+    }
+    
+    // Step 6: Delete each verified expired user
     const deletionResults = [];
     
-    for (const userToDelete of usersToDelete || []) {
+    for (const userToDelete of safeUsersToDelete) {
       try {
         console.log(`Processing deletion for user: ${userToDelete.email}`);
         
@@ -169,7 +202,9 @@ Deno.serve(async (req) => {
       JSON.stringify({
         success: true,
         message: 'Trial cleanup completed',
-        processed: usersToDelete?.length || 0,
+        total_candidates: usersToDelete?.length || 0,
+        protected_users: (usersToDelete?.length || 0) - safeUsersToDelete.length,
+        processed: safeUsersToDelete.length,
         results: deletionResults
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
