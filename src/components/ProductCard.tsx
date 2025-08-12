@@ -82,6 +82,11 @@ export function ProductCard({ product, isCurrentPlan = false }: ProductCardProps
             {product.mode === 'subscription' && (
               <span className="text-gray-600 ml-2 text-xl">/month</span>
             )}
+            {product.mode === 'subscription' && (
+              <div className="mt-3 inline-block bg-green-100 text-green-800 px-4 py-2 border-2 border-green-800 rounded-none">
+                <span className="text-sm font-bold uppercase tracking-wide">7-DAY FREE TRIAL</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -90,25 +95,25 @@ export function ProductCard({ product, isCurrentPlan = false }: ProductCardProps
             <div className="w-6 h-6 bg-black flex items-center justify-center rounded-none">
               <Check className="w-4 h-4 text-white" />
             </div>
-            <span className="text-black font-medium">Premium features access</span>
+            <span className="text-black font-medium">Advanced AI workflow builder</span>
           </div>
           <div className="flex items-center gap-4">
             <div className="w-6 h-6 bg-black flex items-center justify-center rounded-none">
               <Check className="w-4 h-4 text-white" />
             </div>
-            <span className="text-black font-medium">Advanced capabilities</span>
+            <span className="text-black font-medium">Custom integrations & APIs</span>
           </div>
           <div className="flex items-center gap-4">
             <div className="w-6 h-6 bg-black flex items-center justify-center rounded-none">
               <Check className="w-4 h-4 text-white" />
             </div>
-            <span className="text-black font-medium">Priority support</span>
+            <span className="text-black font-medium">Unlimited workflow executions</span>
           </div>
           <div className="flex items-center gap-4">
             <div className="w-6 h-6 bg-black flex items-center justify-center rounded-none">
               <Check className="w-4 h-4 text-white" />
             </div>
-            <span className="text-black font-medium">Cancel anytime</span>
+            <span className="text-black font-medium">7-day free trial included</span>
           </div>
         </div>
 

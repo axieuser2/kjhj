@@ -1,11 +1,38 @@
 import React from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { supabase } from '../lib/supabase';
 import { SubscriptionStatus } from '../components/SubscriptionStatus';
+import { useSubscription } from '../hooks/useSubscription';
 import { Link } from 'react-router-dom';
-import { Crown, Settings, LogOut, ShoppingBag } from 'lucide-react';
+import { Crown, Settings, LogOut, ShoppingBag, Zap, Trash2 } from 'lucide-react';
 
 export function DashboardPage() {
   const { user, signOut } = useAuth();
+  const { hasActiveSubscription, isTrialing } = useSubscription();
+
+  const handleDeleteAccount = async () => {
+    if (!confirm('Are you sure you want to delete your account? This action cannot be undone and will remove your access to AI workflows.')) {
+      return;
+    }
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        // Delete Axie Studio account first
+        await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/axie-studio-account`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Failed to delete Axie Studio account:', error);
+    }
+
+    // Sign out from Supabase (this will also clean up the session)
+    await signOut();
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -41,10 +68,13 @@ export function DashboardPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-12">
           <h2 className="text-4xl font-bold text-black mb-4 uppercase tracking-wide">
-            WELCOME BACK
+            {hasActiveSubscription || isTrialing ? 'AI WORKFLOWS READY' : 'WELCOME TO AXIE STUDIO'}
           </h2>
           <p className="text-gray-600 text-lg">
-            Manage your subscription and access premium features.
+            {hasActiveSubscription || isTrialing 
+              ? 'Your AI workflow platform is active and ready to use.'
+              : 'Start your 7-day free trial to access advanced AI workflow capabilities.'
+            }
           </p>
         </div>
 
@@ -75,15 +105,34 @@ export function DashboardPage() {
                   </div>
                 </Link>
                 
-                <div className="flex items-center gap-4 p-6 border-2 border-gray-300 rounded-none opacity-50">
-                  <div className="w-12 h-12 bg-gray-300 text-gray-500 flex items-center justify-center rounded-none">
-                    <Settings className="w-6 h-6" />
+                {(hasActiveSubscription || isTrialing) && (
+                  <a
+                    href="https://axiestudio-axiestudio-ttefi.ondigitalocean.app"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-4 p-6 border-2 border-black rounded-none hover:bg-gray-50 transition-all hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px]"
+                  >
+                    <div className="w-12 h-12 bg-black text-white flex items-center justify-center rounded-none">
+                      <Zap className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-black uppercase tracking-wide">LAUNCH STUDIO</h4>
+                      <p className="text-sm text-gray-600">Access AI workflow builder</p>
+                    </div>
+                  </a>
+                )}
+                
+                {!(hasActiveSubscription || isTrialing) && (
+                  <div className="flex items-center gap-4 p-6 border-2 border-gray-300 rounded-none opacity-50">
+                    <div className="w-12 h-12 bg-gray-300 text-gray-500 flex items-center justify-center rounded-none">
+                      <Zap className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-500 uppercase tracking-wide">AI WORKFLOWS</h4>
+                      <p className="text-sm text-gray-400">Requires active subscription</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-bold text-gray-500 uppercase tracking-wide">SETTINGS</h4>
-                    <p className="text-sm text-gray-400">Coming soon</p>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -109,18 +158,49 @@ export function DashboardPage() {
 
             <div className="bg-black text-white border-2 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8">
               <h3 className="text-xl font-bold mb-3 uppercase tracking-wide">
-                GO PREMIUM
+                {hasActiveSubscription || isTrialing ? 'STUDIO ACCESS' : 'START FREE TRIAL'}
               </h3>
               <p className="text-gray-300 text-sm mb-6">
-                Unlock advanced capabilities with our premium subscription.
+                {hasActiveSubscription || isTrialing 
+                  ? 'Your AI workflow studio is ready to use with full access to all features.'
+                  : 'Get 7 days free access to advanced AI workflow capabilities.'
+                }
               </p>
-              <Link
-                to="/products"
-                className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-none font-bold hover:bg-gray-100 transition-colors uppercase tracking-wide border-2 border-white hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.3)]"
+              {hasActiveSubscription || isTrialing ? (
+                <a
+                  href="https://axiestudio-axiestudio-ttefi.ondigitalocean.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-none font-bold hover:bg-gray-100 transition-colors uppercase tracking-wide border-2 border-white hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.3)]"
+                >
+                  <Zap className="w-4 h-4" />
+                  OPEN STUDIO
+                </a>
+              ) : (
+                <Link
+                  to="/products"
+                  className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-none font-bold hover:bg-gray-100 transition-colors uppercase tracking-wide border-2 border-white hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.3)]"
+                >
+                  <Crown className="w-4 h-4" />
+                  START TRIAL
+                </Link>
+              )}
+            </div>
+
+            <div className="bg-white border-2 border-red-500 rounded-none shadow-[8px_8px_0px_0px_rgba(239,68,68,1)] p-6">
+              <h3 className="text-lg font-bold text-red-600 mb-3 uppercase tracking-wide">
+                DANGER ZONE
+              </h3>
+              <p className="text-gray-600 text-sm mb-4">
+                Permanently delete your account and all associated data.
+              </p>
+              <button
+                onClick={handleDeleteAccount}
+                className="inline-flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-none font-bold hover:bg-red-700 transition-colors uppercase tracking-wide text-sm border-2 border-red-600"
               >
-                <Crown className="w-4 h-4" />
-                UPGRADE NOW
-              </Link>
+                <Trash2 className="w-4 h-4" />
+                DELETE ACCOUNT
+              </button>
             </div>
           </div>
         </div>

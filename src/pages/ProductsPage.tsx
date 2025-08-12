@@ -35,10 +35,10 @@ export function ProductsPage() {
 
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold text-black mb-6 uppercase tracking-wide">
-            CHOOSE YOUR PLAN
+            START YOUR AI JOURNEY
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Unlock premium features and take your experience to the next level
+            Get 7 days free access to advanced AI workflow capabilities
           </p>
         </div>
 
@@ -65,16 +65,16 @@ export function ProductsPage() {
         <div className="mt-20 text-center">
           <div className="bg-white border-2 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-12 max-w-2xl mx-auto">
             <h3 className="text-2xl font-bold text-black mb-6 uppercase tracking-wide">
-              NEED HELP?
+              WHY CHOOSE PRO?
             </h3>
             <p className="text-gray-600 mb-8 text-lg">
-              All plans come with a satisfaction guarantee and can be canceled anytime. 
-              Start with any plan and upgrade or downgrade as needed.
+              Start with a 7-day free trial to explore advanced AI workflow capabilities. 
+              Cancel anytime during or after your trial period.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-black font-medium">
               <div className="flex items-center justify-center gap-2 p-3 border border-black rounded-none">
                 <span>✓</span>
-                <span className="uppercase tracking-wide">30-DAY GUARANTEE</span>
+                <span className="uppercase tracking-wide">7-DAY FREE TRIAL</span>
               </div>
               <div className="flex items-center justify-center gap-2 p-3 border border-black rounded-none">
                 <span>✓</span>
@@ -82,7 +82,7 @@ export function ProductsPage() {
               </div>
               <div className="flex items-center justify-center gap-2 p-3 border border-black rounded-none">
                 <span>✓</span>
-                <span className="uppercase tracking-wide">24/7 SUPPORT</span>
+                <span className="uppercase tracking-wide">INSTANT ACCESS</span>
               </div>
             </div>
           </div>

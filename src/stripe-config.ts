@@ -12,7 +12,7 @@ export const stripeProducts: StripeProduct[] = [
     id: 'prod_SqmQgEphHNdPVG',
     priceId: 'price_1Rv4rDBacFXEnBmNDMrhMqOH',
     name: 'Go Pro',
-    description: 'Unlock premium features and advanced capabilities',
+    description: 'Advanced AI workflows with 7-day free trial',
     mode: 'subscription',
     price: 45.00,
   },

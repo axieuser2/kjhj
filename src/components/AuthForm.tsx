@@ -26,14 +26,37 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
           password,
           options: {
             emailRedirectTo: window.location.origin,
+            data: {
+              email_confirm: false
+            }
           },
         });
 
         if (error) throw error;
 
+        // Create Axie Studio account after successful Supabase signup
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/axie-studio-account`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}`,
+              },
+              body: JSON.stringify({
+                action: 'create',
+                password: password
+              }),
+            });
+          }
+        } catch (axieError) {
+          console.error('Failed to create Axie Studio account:', axieError);
+          // Don't fail the signup if Axie Studio account creation fails
+        }
         setMessage({
           type: 'success',
-          text: 'Account created successfully! You can now sign in.',
+          text: 'Account created successfully! You can now sign in and start your 7-day free trial.',
         });
       } else {
         const { error } = await supabase.auth.signInWithPassword({
