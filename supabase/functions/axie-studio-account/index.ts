@@ -7,8 +7,8 @@ const supabase = createClient(
 );
 
 const AXIESTUDIO_APP_URL = 'https://axiestudio-axiestudio-ttefi.ondigitalocean.app';
-const AXIESTUDIO_USERNAME = 'stefan@axiestudio.se';
-const AXIESTUDIO_PASSWORD = 'STEfanjohn!12';
+const AXIESTUDIO_USERNAME = Deno.env.get('AXIESTUDIO_USERNAME') || 'stefan@axiestudio.se';
+const AXIESTUDIO_PASSWORD = Deno.env.get('AXIESTUDIO_PASSWORD') || 'STEfanjohn!12';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

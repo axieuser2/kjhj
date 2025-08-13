@@ -4,6 +4,11 @@ import { createClient } from 'npm:@supabase/supabase-js@2.49.1';
 
 const stripeSecret = Deno.env.get('STRIPE_SECRET_KEY')!;
 const stripeWebhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')!;
+
+if (!stripeSecret || !stripeWebhookSecret) {
+  throw new Error('Missing required Stripe environment variables');
+}
+
 const stripe = new Stripe(stripeSecret, {
   appInfo: {
     name: 'Bolt Integration',

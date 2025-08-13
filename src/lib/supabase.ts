@@ -9,7 +9,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export type Database = {
+export interface Database {
   public: {
     Tables: {
       stripe_customers: {
@@ -195,4 +195,4 @@ export type Database = {
       };
     };
   };
-};
+}

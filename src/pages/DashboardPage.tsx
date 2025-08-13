@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 import { SubscriptionStatus } from '../components/SubscriptionStatus';
 import { TrialStatus } from '../components/TrialStatus';
 import { Link } from 'react-router-dom';
-import { Crown, Settings, LogOut, ShoppingBag, Zap, Trash2, Shield } from 'lucide-react';
+import { Crown, Settings, LogOut, ShoppingBag, Zap, Trash2, Shield, AlertTriangle } from 'lucide-react';
 
 export function DashboardPage() {
   const { user, signOut } = useAuth();
