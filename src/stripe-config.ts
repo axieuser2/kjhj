@@ -9,8 +9,8 @@ export interface StripeProduct {
 
 export const stripeProducts: StripeProduct[] = [
   {
-    id: 'prod_SqmQgEphHNdPVG',
-    priceId: 'price_1Rv4rDBacFXEnBmNDMrhMqOH',
+    id: import.meta.env.VITE_STRIPE_PRO_PRODUCT_ID || 'prod_SqmQgEphHNdPVG',
+    priceId: import.meta.env.VITE_STRIPE_PRO_PRICE_ID || 'price_1Rv4rDBacFXEnBmNDMrhMqOH',
     name: 'Go Pro',
     description: 'Advanced AI workflows with 7-day free trial',
     mode: 'subscription',

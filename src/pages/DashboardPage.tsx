@@ -167,7 +167,7 @@ export function DashboardPage() {
                 
                 {hasAccess && (
                   <a
-                    href="https://axiestudio-axiestudio-ttefi.ondigitalocean.app"
+                    href={import.meta.env.VITE_AXIESTUDIO_APP_URL || 'https://axiestudio-axiestudio-ttefi.ondigitalocean.app'}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-4 p-6 border-2 border-black rounded-none hover:bg-gray-50 transition-all hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px]"

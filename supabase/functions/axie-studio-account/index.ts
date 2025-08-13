@@ -6,9 +6,13 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 );
 
-const AXIESTUDIO_APP_URL = 'https://axiestudio-axiestudio-ttefi.ondigitalocean.app';
-const AXIESTUDIO_USERNAME = Deno.env.get('AXIESTUDIO_USERNAME') || 'stefan@axiestudio.se';
-const AXIESTUDIO_PASSWORD = Deno.env.get('AXIESTUDIO_PASSWORD') || 'STEfanjohn!12';
+const AXIESTUDIO_APP_URL = Deno.env.get('AXIESTUDIO_APP_URL')!;
+const AXIESTUDIO_USERNAME = Deno.env.get('AXIESTUDIO_USERNAME')!;
+const AXIESTUDIO_PASSWORD = Deno.env.get('AXIESTUDIO_PASSWORD')!;
+
+if (!AXIESTUDIO_APP_URL || !AXIESTUDIO_USERNAME || !AXIESTUDIO_PASSWORD) {
+  throw new Error('Missing required Axie Studio environment variables');
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
